@@ -3,6 +3,10 @@
   "version": "1.1.2",
   "description": "Spins up an empty, temporary scuttlebot server that stores data in your temp folder",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ssbc/scuttle-testbot"
+  },
   "scripts": {
     "test": "tape test/*.js"
   },
