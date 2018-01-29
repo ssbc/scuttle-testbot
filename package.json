@@ -1,6 +1,6 @@
 {
-  "name": "scuttletestbot",
-  "version": "1.0.1",
+  "name": "scuttle-testbot",
+  "version": "1.0.0",
   "description": "Spins up an empty, temporary scuttlebot server that stores data in your temp folder",
   "main": "index.js",
   "scripts": {
