@@ -1,0 +1,24 @@
+{
+  "name": "scuttletestbot",
+  "version": "1.0.0",
+  "description": "Spins up an empty, temporary scuttlebot server that stores data in your temp folder",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js"
+  },
+  "keywords": [
+    "ssb",
+    "testing",
+    "scuttlebot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "rimraf": "^2.6.2",
+    "scuttlebot": "^10.5.0",
+    "ssb-keys": "^7.0.13"
+  },
+  "devDependencies": {
+    "tape": "^4.8.0"
+  }
+}
