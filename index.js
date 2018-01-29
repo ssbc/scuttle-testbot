@@ -10,7 +10,10 @@ function createTestBot(name, opts) {
   if(opts && !opts.startUnclean)
     rimraf.sync(folderPath)
 
-  return createSbot({keys: ssbKeys.generate(), temp: name})
+  if(opts && !opts.keys)
+    var keys = ssbKeys.generate()
+
+  return createSbot({keys, temp: name})
 }
 
 module.exports = createTestBot 
