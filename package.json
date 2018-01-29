@@ -19,6 +19,7 @@
     "ssb-keys": "^7.0.13"
   },
   "devDependencies": {
+    "ssb-about": "^0.1.2",
     "tape": "^4.8.0"
   }
 }

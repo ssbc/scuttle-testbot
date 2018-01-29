@@ -4,16 +4,30 @@ var rimraf = require('rimraf')
 
 var createSbot = require('scuttlebot')
 
-function createTestBot(name, opts) {
-  let folderPath = path.join("/tmp/", name)
+var plugins = []
 
-  if(opts && !opts.startUnclean)
+function createTestBot(opts) {
+  opts = opts || {}
+
+  if(!opts.name)
+    opts.name = "ssb-test-" + Number(new Date())
+
+  let folderPath = path.join("/tmp", opts.name)
+
+  if(!opts.startUnclean)
     rimraf.sync(folderPath)
 
-  if(opts && !opts.keys)
+  if(!opts.keys)
     var keys = ssbKeys.generate()
 
-  return createSbot({keys, temp: name})
+  if(plugins.length)
+    plugins.forEach(plugin => createSbot.use(plugin))
+
+  return createSbot({keys, temp: opts.name})
+}
+
+createTestBot.use = function(plugin) {
+  plugins.push(plugin)
 }
 
 module.exports = createTestBot 
