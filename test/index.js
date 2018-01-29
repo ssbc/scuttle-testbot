@@ -9,8 +9,13 @@ test('creates an sbot', function(t) {
   t.end()
 })
 
-test('adds an sbot plugin', function(t) {
-  var sbot = CreateTestSbot({name: 'another', plugins: [ssbAbout]})
+test('adds an sbot plugin and can be chained', function(t) {
+  CreateTestSbot
+    .use({init: ()=>{}})
+    .use({init: ()=>{}})
+
+  sbot = CreateTestSbot()
+
   t.ok(sbot)
   sbot.close()
   t.end()

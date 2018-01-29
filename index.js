@@ -28,6 +28,7 @@ function createTestBot(opts) {
 
 createTestBot.use = function(plugin) {
   plugins.push(plugin)
+  return createTestBot
 }
 
 module.exports = createTestBot 
