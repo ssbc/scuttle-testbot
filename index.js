@@ -20,8 +20,10 @@ function createTestBot(opts) {
   if(!opts.keys)
     var keys = ssbKeys.generate()
 
-  if(plugins.length)
+  if(plugins.length) {
     plugins.forEach(plugin => createSbot.use(plugin))
+    plugins = []
+  }
 
   return createSbot({keys, temp: opts.name})
 }
@@ -31,4 +33,4 @@ createTestBot.use = function(plugin) {
   return createTestBot
 }
 
-module.exports = createTestBot 
+module.exports = createTestBot
