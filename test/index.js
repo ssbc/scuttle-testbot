@@ -11,8 +11,8 @@ test('creates an sbot', function(t) {
 
 test('adds an sbot plugin and can be chained', function(t) {
   CreateTestSbot
-    .use({init: ()=>{}})
-    .use({init: ()=>{}})
+    .use({init: ()=>{}, name: 'fakePlugin1'})
+    .use({init: ()=>{}, name: 'fakePlugin2'})
 
   sbot = CreateTestSbot()
 
