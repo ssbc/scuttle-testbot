@@ -1,34 +1,30 @@
 var ssbKeys = require('ssb-keys')
-var path = require('path');
+var path = require('path')
 var rimraf = require('rimraf')
-
-var createSbot = require('scuttlebot')
 
 var plugins = []
 
-function createTestBot(opts) {
+function createTestBot (opts) {
   opts = opts || {}
 
-  if(!opts.name)
-    opts.name = "ssb-test-" + Number(new Date())
+  var createSbot = require('scuttlebot')
+  if (createSbot.createSbot) { createSbot = createSbot.createSbot() }
 
-  let folderPath = path.join("/tmp", opts.name)
+  if (!opts.name) { opts.name = 'ssb-test-' + Number(new Date()) }
 
-  if(!opts.startUnclean)
-    rimraf.sync(folderPath)
+  let folderPath = path.join('/tmp', opts.name)
 
-  if(!opts.keys)
-    var keys = ssbKeys.generate()
+  if (!opts.startUnclean) { rimraf.sync(folderPath) }
 
-  if(plugins.length) {
-    plugins.forEach(plugin => createSbot.use(plugin))
-    plugins = []
-  }
+  if (!opts.keys) { opts.keys = ssbKeys.generate() }
 
-  return createSbot({keys, temp: opts.name})
+  plugins.forEach(plugin => createSbot.use(plugin))
+  plugins = []
+
+  return createSbot(Object.assign({}, opts, {temp: opts.name}))
 }
 
-createTestBot.use = function(plugin) {
+createTestBot.use = function (plugin) {
   plugins.push(plugin)
   return createTestBot
 }
