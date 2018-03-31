@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "rimraf": "^2.6.2",
-    "scuttlebot": "^11.1.0",
+    "scuttlebot": "git://github.com/ssbc/scuttlebot.git#rtc",
     "ssb-keys": "^7.0.13"
   },
   "devDependencies": {
