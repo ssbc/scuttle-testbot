@@ -18,12 +18,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "rimraf": "^2.6.2",
-    "scuttlebot": "^11.1.0",
-    "ssb-keys": "^7.0.13"
+    "rimraf": "^2.6.3",
+    "ssb-keys": "^7.1.7",
+    "ssb-server": "^15.0.2"
   },
   "devDependencies": {
-    "ssb-about": "^0.1.2",
-    "tape": "^4.8.0"
+    "ssb-about": "^2.0.1",
+    "tape": "^4.11.0"
   }
 }
