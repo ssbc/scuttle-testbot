@@ -1,6 +1,6 @@
 {
   "name": "scuttle-testbot",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Spins up an empty, temporary ssb-server server that stores data in your temp folder",
   "main": "index.js",
   "repository": {
@@ -20,13 +20,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "rimraf": "^2.6.2",
+    "rimraf": "^2.6.3",
     "secret-stack": "^6.3.1",
     "ssb-db": "^19.3.1",
-    "ssb-keys": "^7.0.13"
+    "ssb-keys": "^7.1.7"
   },
   "devDependencies": {
-    "ssb-about": "^0.1.2",
-    "tape": "^4.8.0"
+    "ssb-about": "^2.0.1",
+    "tape": "^4.11.0"
   }
 }
