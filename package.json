@@ -1,7 +1,7 @@
 {
   "name": "scuttle-testbot",
   "version": "1.1.5",
-  "description": "Spins up an empty, temporary scuttlebot server that stores data in your temp folder",
+  "description": "Spins up an empty, temporary ssb-server server that stores data in your temp folder",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -12,14 +12,17 @@
   },
   "keywords": [
     "ssb",
+    "scuttlebutt",
+    "test",
     "testing",
-    "scuttlebot"
+    "ssb-server"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "rimraf": "^2.6.2",
-    "scuttlebot": "^11.1.0",
+    "secret-stack": "^6.3.1",
+    "ssb-db": "^19.3.1",
     "ssb-keys": "^7.0.13"
   },
   "devDependencies": {

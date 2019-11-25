@@ -1,6 +1,6 @@
 # scuttle-testbot
 
-> Spins up an empty, temporary scuttlebot server that stores data in your temp folder
+> Spins up an empty, temporary ssb-server that stores data in your temp folder
 
 
 ## Usage
@@ -48,7 +48,7 @@ var CreateTestSbot = require('scuttle-testbot')
 
 ### CreateTestSbot(opts={})
 
-Returns a scuttlebot instance.
+Returns a ssb-server instance.
 
 By default, CreateTestSbot deletes an existing database of the same `name` before starting.
 
@@ -63,7 +63,7 @@ Valid `opts` keys include:
 
 ### CreateTestSbot.use(require('ssb-about'))
 
-`CreateTestSbot.use` lets you add scuttlebot plugins. `use` can be chained the same as the scuttlebot api.
+`CreateTestSbot.use` lets you add ssb-server plugins. `use` can be chained the same as the ssb-server api.
 
 ## Install
 
