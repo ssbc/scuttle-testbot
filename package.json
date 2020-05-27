@@ -1,6 +1,6 @@
 {
   "name": "scuttle-testbot",
-  "version": "1.1.7",
+  "version": "1.2.0",
   "description": "Spins up an empty, temporary ssb-server server that stores data in your temp folder",
   "main": "index.js",
   "repository": {
