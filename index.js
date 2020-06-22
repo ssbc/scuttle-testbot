@@ -16,7 +16,9 @@ function createTestBot (opts) {
 
   if (createSbot.createSbot) { createSbot = createSbot.createSbot() }
 
-  if (!opts.name) { opts.name = 'ssb-test-' + Number(new Date()) }
+  if (!opts.name) {
+    opts.name = `ssb-test-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+  }
 
   let folderPath = path.join('/tmp', opts.name)
 
@@ -27,7 +29,7 @@ function createTestBot (opts) {
   plugins.forEach(plugin => createSbot.use(plugin))
   plugins = []
 
-  return createSbot(Object.assign({}, opts, {temp: opts.name}))
+  return createSbot(Object.assign({}, opts, { temp: opts.name }))
 }
 
 createTestBot.use = function (plugin) {
