@@ -2,6 +2,7 @@ var ssbKeys = require('ssb-keys')
 var crypto = require('crypto')
 var path = require('path')
 var rimraf = require('rimraf')
+const os = require('os')
 
 var plugins = []
 
@@ -29,7 +30,7 @@ function createTestBot (opts) {
   plugins.forEach(plugin => createSbot.use(plugin))
   plugins = []
 
-  return createSbot(Object.assign({}, opts, { temp: opts.name }))
+  return createSbot(Object.assign({}, opts, { path: path.join(os.tmpdir(), opts.name) }))
 }
 
 createTestBot.use = function (plugin) {
