@@ -38,3 +38,26 @@ test('multi sbots that share some of the same plugins', function (t) {
   sbot2.close()
   t.end()
 })
+
+test('persist database across instances', (t) => {
+  const a = CreateTestSbot({ name: 'persistent' })
+
+  a.publish({ type: 'test' }, (err, val) => {
+    t.error(err, 'no error on publish')
+    a.close((err) => {
+      t.error(err, 'no error on close')
+      const b = CreateTestSbot({
+        name: 'persistent',
+        startUnclean: true,
+        keys: a.keys
+      })
+      b.get(val.key, (err, val) => {
+        t.error(err, 'no error on get')
+        t.ok(val, 'got message')
+        b.close(t.end)
+      })
+    })
+  })
+})
+
+
