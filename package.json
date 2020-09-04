@@ -20,9 +20,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "pull-stream": "^3.6.14",
     "rimraf": "^3.0.0",
     "secret-stack": "^6.3.1",
-    "ssb-db": "^20.2.0",
+    "ssb-db": "^20.3.0",
     "ssb-keys": "^7.2.2"
   },
   "devDependencies": {
