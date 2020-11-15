@@ -101,7 +101,7 @@ piet.publish(content, (err, msg) => {
 })
 ```
 
-arguements:
+arguments:
 - `from` *SSB* - an ssb instance to be replicated from. This will replicate only this feeds messages (not everything in log)
 - `to` *SSB* - an ssb instance being replicate to.
 - `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
@@ -116,21 +116,62 @@ arguements:
 - `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
     - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
+Under the hood this just uses `createHistoryStream` directly from one peer to another
 
-## Install
 
-With [npm](https://npmjs.org/) installed, run
 
+### `Testbot.connect(peers, { names, friends }, done)`
+
+Connects all listed peers.
+
+Example:
+
+```js
+const crypto = require('crypto')
+
+const Server = (opts) => {
+  const stack = require('scuttle-testbot')
+    .use('ssb-friends') // only needed if opts.friends
+
+  return stack(opts)
+}
+
+const caps = { shs: crypto.randomBytes(32).toString('base64') }
+const piet = Server({ caps })
+const katie = Server({ caps })
+// all peers need to have same caps to be able to connect to each other
+
+Testbot.connect([piet, katie], { friends: true }, (err) => {
+  // as friends: true - piet now follows katie + vice versa
+  // and there is a connection live between these two
+
+  piet.close()
+  katie.close()
+})
 ```
-$ npm install scuttle-testbot
-```
 
-## Acknowledgments
+arguments:
+- `peers` *Array*
+    - a collection of ssb instances which will all be connected to one another
+    - NOTE: by default scuttle-testbot creates random caps for each instance. You need to overide this as in example to form connections
 
+- `friends` *Boolean* (optional)
+    - if true will get each peer to publish a follow for each other peer in the list
+    - NOTE: this requires `ssb-friends` to be installed
+    - default: `false`
+- `name` *Function* (optional) - makes logged output easier to read by allowing you to replace feedIds with human readable names
+    ```js
+    // example
+    const name = (feedId) => {
+      if (feedId === piet.id) return 'piet'
+      if (feedId === katie.id) return 'katie'
+    }
+    ```
+- `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
+    - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
-## See Also
+Under the hood this just uses `createHistoryStream` directly from one peer to another
 
-- [`noffle/common-readme`](https://github.com/noffle/common-readme)
 
 ## License
 

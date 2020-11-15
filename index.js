@@ -5,8 +5,9 @@ const rimraf = require('rimraf')
 const os = require('os')
 
 const replicate = require('./replicate')
+const connect = require('./connect')
 
-var plugins = []
+let plugins = []
 
 function createTestBot (opts = {}) {
   if (!opts.name) {
@@ -16,10 +17,10 @@ function createTestBot (opts = {}) {
   if (!opts.startUnclean) { rimraf.sync(folderPath) }
   if (!opts.keys) { opts.keys = ssbKeys.generate() }
 
-  var caps = {
+  const caps = {
     shs: (opts.caps && opts.caps.shs) || crypto.randomBytes(32).toString('base64')
   }
-  var createSbot = require('secret-stack')({ caps })
+  let createSbot = require('secret-stack')({ caps })
     .use(require('ssb-db'))
     .use(require('ssb-conn'))
 
@@ -38,5 +39,6 @@ createTestBot.use = function use (plugin) {
   return createTestBot
 }
 createTestBot.replicate = replicate
+createTestBot.connect = connect
 
 module.exports = createTestBot

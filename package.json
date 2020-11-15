@@ -20,6 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "pull-paramap": "^1.2.2",
     "pull-stream": "^3.6.14",
     "rimraf": "^3.0.0",
     "secret-stack": "^6.3.1",
@@ -29,7 +30,7 @@
   },
   "devDependencies": {
     "ssb-about": "^2.0.1",
-    "ssb-friends": "^4.2.1",
+    "ssb-friends": "^4.3.0",
     "ssb-replicate": "^1.3.2",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.0"
