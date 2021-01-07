@@ -59,3 +59,23 @@ test('persist database across instances', (t) => {
     })
   })
 })
+
+test('allows two peers to share the same folder', (t) => {
+  const a = CreateTestSbot({ name: 'scuttle-testbot-shared' })
+
+  a.publish({ type: 'test' }, (err, val) => {
+    t.error(err, 'no error on publish')
+    a.close((err) => {
+      t.error(err, 'no error on close')
+      const b = CreateTestSbot({
+        path: '/tmp/scuttle-testbot-shared',
+        startUnclean: true,
+      })
+      b.get(val.key, (err, val) => {
+        t.error(err, 'no error on get')
+        t.ok(val, 'got message')
+        b.close(t.end)
+      })
+    })
+  })
+})

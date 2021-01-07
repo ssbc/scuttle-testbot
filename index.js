@@ -13,8 +13,10 @@ function createTestBot (opts = {}) {
   if (!opts.name) {
     opts.name = `ssb-test-${Date.now()}-${Math.floor(Math.random() * 1000)}`
   }
-  const folderPath = join('/tmp', opts.name)
-  if (!opts.startUnclean) { rimraf.sync(folderPath) }
+  if (!opts.path) {
+    opts.path = join(os.tmpdir(), opts.name)
+  }
+  if (!opts.startUnclean) { rimraf.sync(opts.path) }
   if (!opts.keys) { opts.keys = ssbKeys.generate() }
 
   const caps = {
@@ -28,10 +30,7 @@ function createTestBot (opts = {}) {
   plugins.forEach(plugin => createSbot.use(plugin))
   plugins = []
 
-  return createSbot({
-    ...opts,
-    path: join(os.tmpdir(), opts.name)
-  })
+  return createSbot(opts)
 }
 
 createTestBot.use = function use (plugin) {
