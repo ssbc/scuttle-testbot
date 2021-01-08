@@ -18,18 +18,18 @@ piet.publish({type: 'test', content: "a test message"}, (err, msg) => {
 
 Outputs:
 ```
-{ 
+{
   key: '%FQ2auS8kVY9qPgpTWNY3le/JG5+IlO6JHDjBIQcSPSc=.sha256',
-  value: { 
+  value: {
     previous: null,
     sequence: 1,
     author: '@UreG2i/rf4mz7QAVOtg0OML5SRRB42Cwwl3D1ct0mbU=.ed25519',
     timestamp: 1517190039755,
     hash: 'sha256',
     content: { type: 'test', content: 'a test message' },
-    signature: '0AxMJ7cKjHQ6vJDPkVNWcGND4gUwv2Z8barND5eha7ZXH/s5T0trFqcratIqzmhE3YJU2FY61Rf1S/Za2foLCA==.sig.ed25519' 
+    signature: '0AxMJ7cKjHQ6vJDPkVNWcGND4gUwv2Z8barND5eha7ZXH/s5T0trFqcratIqzmhE3YJU2FY61Rf1S/Za2foLCA==.sig.ed25519'
   },
-  timestamp: 1517190039758 
+  timestamp: 1517190039758
 }
 ```
 
@@ -47,7 +47,8 @@ By default, CreateTestSbot deletes an existing database of the same `name` befor
 
 Valid `opts` keys include:
 - `name` *String* (optional) (default: `ssb-test + Number(new Date)`)
-    - `myTestName`: Sets the database in /tmp/myTestName 
+- `path` *String* (optional) (default: `/tmp/${name}`, where `name` is the above)
+    - `~/.ssb-test`: Sets the database in `~/.ssb-test`
 - `keys` *String* (optional) (default: scuttle-testbot generates a new set of random keys)
     - you can create your own keys with `ssbKeys.generate()`
 - `startUnclean` (default: `false`)

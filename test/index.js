@@ -1,4 +1,5 @@
 var test = require('tape')
+var fs = require('fs')
 var CreateTestSbot = require('../')
 
 test('creates an sbot', function (t) {
@@ -56,6 +57,19 @@ test('persist database across instances', (t) => {
         t.ok(val, 'got message')
         b.close(t.end)
       })
+    })
+  })
+})
+
+test('allows specifying the path to the db', (t) => {
+  const a = CreateTestSbot({ path: '/tmp/overhere/scuttle-testbot' })
+
+  a.publish({ type: 'test' }, (err, val) => {
+    t.error(err, 'no error on publish')
+    a.close((err) => {
+      t.error(err, 'no error on close')
+      t.true(fs.existsSync('/tmp/overhere/scuttle-testbot/conn.json'))
+      t.end()
     })
   })
 })
