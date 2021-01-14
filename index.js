@@ -19,6 +19,9 @@ function createTestBot (opts = {}) {
   if (!opts.startUnclean) { rimraf.sync(opts.path) }
   if (!opts.keys) { opts.keys = ssbKeys.generate() }
 
+  if (!opts.conn) opts.conn = {}
+  if (typeof opts.conn.autostart !== 'boolean') opts.conn.autostart = false
+
   const caps = {
     shs: (opts.caps && opts.caps.shs) || crypto.randomBytes(32).toString('base64')
   }

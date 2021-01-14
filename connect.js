@@ -56,6 +56,11 @@ function allConnect (peers, opts, done) {
               if (connections.has(pair.join())) return _cb(null)
               connections.add(pair.join())
 
+              peer.conn.start()
+              // NOTE: I have disabled conn autostart in config
+              // I have put this conn.start call in here to make sure the scheduler
+              // is started, so no problems with conn.connect?
+              // I don't actually know if this is needed!!!
               peer.conn.connect(_peer.getAddress(), (err, rpc) => {
                 if (err) return _cb(err)
                 console.log(pair.map(name).join('----'))
