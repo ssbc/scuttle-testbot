@@ -73,3 +73,9 @@ test('allows specifying the path to the db', (t) => {
     })
   })
 })
+
+test('can use db2', function (t) {
+  var sbot = CreateTestSbot({ db2: true })
+  t.ok(sbot.db)
+  sbot.close(t.end)
+})
