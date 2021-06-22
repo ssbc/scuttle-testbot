@@ -54,7 +54,7 @@ Valid `opts` keys include:
 - `startUnclean` (default: `false`)
     - `true`: Don't delete an existing database before starting up.
     - this is useful if you want to test state after stopping and starting a server. In this case you need to set the `name` and `keys` options to be connecting to the same log
-
+- `db2` (default: `false`)
 
 ### `TestBot.use(plugin)`
 

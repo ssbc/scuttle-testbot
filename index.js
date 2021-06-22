@@ -26,8 +26,12 @@ function createTestBot (opts = {}) {
     shs: (opts.caps && opts.caps.shs) || crypto.randomBytes(32).toString('base64')
   }
   let createSbot = require('secret-stack')({ caps })
-    .use(require('ssb-db'))
     .use(require('ssb-conn'))
+
+  if (opts.db2)
+    createSbot = createSbot.use(require('ssb-db2'))
+  else
+    createSbot = createSbot.use(require('ssb-db'))
 
   if (createSbot.createSbot) { createSbot = createSbot.createSbot() }
   plugins.forEach(plugin => createSbot.use(plugin))
