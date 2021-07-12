@@ -8,9 +8,12 @@ function replicate ({ from, to, live = false, name = abbrev }, done) {
       from.createHistoryStream({ id: from.id, seq: state.sequence + 1, live }),
       pull.filter(m => m.sync !== true),
       pull.asyncMap((m, cb) => to.add(m.value, cb)),
-      pull.asyncMap((m, cb) =>
-        to.get({ id: m.key, private: true, meta: true }, cb)
-      ),
+      pull.asyncMap((m, cb) => {
+        if (to.db)
+          to.get(m.key, (err, msgValue) => cb(err, { key: m.key, value: msgValue }))
+        else
+          to.get({ id: m.key, private: true, meta: true }, cb)
+      }),
       pull.drain(
         (m) => {
           const type = m.value.content.type || '?' // encrypted
