@@ -63,8 +63,7 @@ test('replicate (promise)', async t => {
     recps: [groupId]
   }
 
-  await p(piet.publish)(content)
-  await p(piet.publish)(content)
+  for (let i = 0; i < 10; i++) await p(piet.publish)(content)
   const msg = await p(piet.publish)(content)
 
   await p(piet.tribes.invite)(groupId, [katie.id], {})
