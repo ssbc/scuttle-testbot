@@ -11,7 +11,7 @@ function replicate ({ from, to, live = false, name = defaultName }, done) {
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
 
-    process.stdout.write(`\r    ${fromName} ─> ${toName}\n`)
+    if (!live) process.stdout.write(`\r    ${fromName} ─> ${toName}\n`)
 
     const start = state.sequence + 1
     let type
@@ -26,20 +26,23 @@ function replicate ({ from, to, live = false, name = defaultName }, done) {
       ),
       pull.drain(
         (m) => {
-          sameCount.push(m.value.sequence)
+          if (live) liveLog(m, fromName, toName, name)
+          else {
+            sameCount.push(m.value.sequence)
 
-          type = getType(m, name)
-          if (lastType && type !== lastType) {
-            if (sameCount.length) {
-              process.stdout.write('\n')
-              sameCount = []
+            type = getType(m, name)
+            if (lastType && type !== lastType) {
+              if (sameCount.length) {
+                process.stdout.write('\n')
+                sameCount = []
+              }
+              process.stdout.write(`\r      [${m.value.sequence}]: ${type}`)
+            } else {
+              process.stdout.write(`\r      [${sameCount.join(',')}]: ${type}`)
             }
-            process.stdout.write(`\r      [${m.value.sequence}]: ${type}`)
-          } else {
-            process.stdout.write(`\r      [${sameCount.join('][')}]: ${type}`)
-          }
 
-          lastType = type
+            lastType = type
+          }
         },
         (err) => {
           process.stdout.write('\n')
@@ -56,6 +59,10 @@ module.exports = replicate
 
 function defaultName (key) {
   return key.slice(0, 9)
+}
+
+function liveLog (msg, fromName, toName, name) {
+  console.log(` ${fromName}[${msg.value.sequence}] ─> ${toName}: ${getType(msg, name)}`)
 }
 
 function getType (msg, name) {
