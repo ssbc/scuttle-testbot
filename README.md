@@ -117,9 +117,13 @@ arguments:
 - `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
     - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
-Under the hood this just uses `createHistoryStream` directly from one peer to another
+Also supports promise style.
+```js
+  await TestBot.replicate({ from: piet, to: katie })
+```
+This requires that `live: false`
 
-
+Under the hood this function just uses `createHistoryStream` directly from one peer to another
 
 ### `Testbot.connect(peers, { names, friends }, done)`
 

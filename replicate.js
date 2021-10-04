@@ -1,11 +1,24 @@
 const pull = require('pull-stream')
+const { promisify } = require('util')
 
-function replicate ({ from, to, live = false, name = abbrev }, done) {
+function replicate ({ from, to, live = false, name = defaultName }, done) {
+  if (live && done) throw new Error('cannot set live && done!')
+  if (!live && !done) return promisify(replicate)({ from, to, name })
+
+  const fromName = name(from.id)
+  const toName = name(to.id)
+
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
 
+    process.stdout.write(`\r    ${fromName} ─> ${toName}\n`)
+
+    const start = state.sequence + 1
+    let type
+    let lastType
+    let sameCount = []
     pull(
-      from.createHistoryStream({ id: from.id, seq: state.sequence + 1, live }),
+      from.createHistoryStream({ id: from.id, seq: start, live }),
       pull.filter(m => m.sync !== true),
       pull.asyncMap((m, cb) => to.add(m.value, cb)),
       pull.asyncMap((m, cb) =>
@@ -13,15 +26,23 @@ function replicate ({ from, to, live = false, name = abbrev }, done) {
       ),
       pull.drain(
         (m) => {
-          const type = m.value.content.type || '?' // encrypted
-          const extra = type === 'group/add-member'
-            ? `, ${m.value.content.recps.filter(r => r[0] === '@').map(name)}`
-            : ''
+          sameCount.push(m.value.sequence)
 
-          const replication = `${name(m.value.author)}: ${m.value.sequence} --> ${name(to.id)}`
-          console.log(`${replication}   (sees: ${type}${extra})`)
+          type = getType(m, name)
+          if (lastType && type !== lastType) {
+            if (sameCount.length) {
+              process.stdout.write('\n')
+              sameCount = []
+            }
+            process.stdout.write(`\r      [${m.value.sequence}]: ${type}`)
+          } else {
+            process.stdout.write(`\r      [${sameCount.join('][')}]: ${type}`)
+          }
+
+          lastType = type
         },
         (err) => {
+          process.stdout.write('\n')
           if (typeof done === 'function') return done(err)
           if (err) {
             throw err
@@ -33,6 +54,16 @@ function replicate ({ from, to, live = false, name = abbrev }, done) {
 }
 module.exports = replicate
 
-function abbrev (key) {
+function defaultName (key) {
   return key.slice(0, 9)
+}
+
+function getType (msg, name) {
+  const { type = '???', recps } = msg.value.content
+
+  const addedMembers = type === 'group/add-member'
+    ? ` (${recps.filter(r => r[0] === '@').map(name)}) `
+    : ''
+
+  return type + addedMembers
 }

@@ -1,6 +1,8 @@
-var test = require('tape')
+const test = require('tape')
 const pull = require('pull-stream')
-var TestBot = require('../')
+const { promisify: p } = require('util')
+
+const TestBot = require('../')
 
 test('replicate', t => {
   const piet = TestBot()
@@ -35,6 +37,51 @@ test('replicate', t => {
       })
     })
   })
+})
+
+test('replicate (promise)', async t => {
+  const piet = TestBot
+    .use(require('ssb-backlinks'))
+    .use(require('ssb-tribes'))
+    .call()
+
+  const katie = TestBot
+    .use(require('ssb-backlinks'))
+    .use(require('ssb-tribes'))
+    .call()
+
+  const name = (feedId) => {
+    if (feedId === piet.id) return 'piet'
+    if (feedId === katie.id) return 'katie'
+  }
+
+  const { groupId } = await p(piet.tribes.create)({})
+
+  const content = {
+    type: 'direct-message',
+    text: 'oh hey',
+    recps: [groupId]
+  }
+
+  await p(piet.publish)(content)
+  await p(piet.publish)(content)
+  const msg = await p(piet.publish)(content)
+
+  await p(piet.tribes.invite)(groupId, [katie.id], {})
+
+  await TestBot.replicate({ from: piet, to: katie, name })
+
+  // HACK give it a moment to rebuild!
+  await new Promise(resolve => setTimeout(resolve, 300))
+  const value = await p(katie.get)({ id: msg.key, private: true })
+
+  t.deepEqual(value.content, content)
+  // should be same as content piet sent, if katie can decrypt
+
+  piet.close()
+  katie.close()
+
+  t.end()
 })
 
 test('replicate (live)', t => {

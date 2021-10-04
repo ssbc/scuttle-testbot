@@ -63,7 +63,7 @@ function allConnect (peers, opts, done) {
               // I don't actually know if this is needed!!!
               peer.conn.connect(_peer.getAddress(), (err, rpc) => {
                 if (err) return _cb(err)
-                console.log(pair.map(name).join('----'))
+                console.log(pair.map(name).join(' ┄─┄ '))
                 cb(null, rpc)
               })
             },
