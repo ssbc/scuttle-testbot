@@ -111,3 +111,24 @@ test('replicate (live)', t => {
 
   piet.publish(content, () => {})
 })
+
+test('replicate (log: false)', async t => {
+  const piet = TestBot()
+  const katie = TestBot()
+
+  const content = {
+    type: 'direct-message',
+    text: 'oh hey'
+  }
+  const msg = await p(piet.publish)(content)
+
+  await TestBot.replicate({ from: piet, to: katie, log: false })
+
+  const value = await p(katie.get)({ id: msg.key, private: true })
+
+  t.deepEqual(value.content, content)
+
+  piet.close()
+  katie.close()
+  t.end()
+})

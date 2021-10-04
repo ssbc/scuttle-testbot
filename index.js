@@ -28,10 +28,8 @@ function createTestBot (opts = {}) {
   let createSbot = require('secret-stack')({ caps })
     .use(require('ssb-conn'))
 
-  if (opts.db2)
-    createSbot = createSbot.use(require('ssb-db2'))
-  else
-    createSbot = createSbot.use(require('ssb-db'))
+  if (opts.db2) createSbot.use(require('ssb-db2'))
+  else createSbot.use(require('ssb-db'))
 
   if (createSbot.createSbot) { createSbot = createSbot.createSbot() }
   plugins.forEach(plugin => createSbot.use(plugin))

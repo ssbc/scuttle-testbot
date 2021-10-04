@@ -1,19 +1,25 @@
 const pull = require('pull-stream')
 const { promisify } = require('util')
+
+const color = require('./color')
+
 const ARROW = '─>'
 const ENCRYPTED_TYPE = '[?]'
 
-function replicate ({ from, to, live = false, name = defaultName }, done) {
-  if (live && done) throw new Error('cannot set live && done!')
-  if (!live && !done) return promisify(replicate)({ from, to, name })
+function replicate (opts, done) {
+  if (!opts.live && !done) return promisify(replicate)(opts)
 
-  const fromName = name(from.id)
-  const toName = name(to.id)
+  const { from, to, live = false, name = defaultName, log = console.log } = opts
+  if (live && done) throw new Error('cannot set live && done!')
+
+  const fromColor = color(name(from.id))
+  const fromName = fromColor(name(from.id))
+  const toName = color(name(to.id))(name(to.id))
 
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
 
-    if (!live) console.log(`${fromName} ${ARROW} ${toName}`)
+    if (!live && log) log(`${fromName} ${ARROW} ${toName}`)
 
     const start = state.sequence + 1
     pull(
@@ -25,9 +31,12 @@ function replicate ({ from, to, live = false, name = defaultName }, done) {
       ),
       pull.drain(
         (m) => {
-          if (live) liveLog(m, fromName, toName, name)
-          else {
-            console.log(`${getSeq(m)} ${getType(m, name)}`)
+          if (!log) return
+
+          if (live) {
+            log(`${fromName} [${m.value.sequence}] ${ARROW} ${toName}: ${getType(m, name)}`)
+          } else {
+            log(`${fromColor(getSeq(m))} ${getType(m, name)}`)
           }
         },
         (err) => {
@@ -44,10 +53,6 @@ module.exports = replicate
 
 function defaultName (key) {
   return key.slice(0, 9)
-}
-
-function liveLog (msg, fromName, toName, name) {
-  console.log(`${fromName} [${msg.value.sequence}] ${ARROW} ${toName}: ${getType(msg, name)}`)
 }
 
 function getSeq (msg) {

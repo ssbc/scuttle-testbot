@@ -46,12 +46,12 @@ Returns a ssb-server instance.
 By default, CreateTestSbot deletes an existing database of the same `name` before starting.
 
 Valid `opts` keys include:
-- `name` *String* (optional) (default: `ssb-test + Number(new Date)`)
-- `path` *String* (optional) (default: `/tmp/${name}`, where `name` is the above)
+- `opts.name` *String* (optional) (default: `ssb-test + Number(new Date)`)
+- `opts.path` *String* (optional) (default: `/tmp/${name}`, where `name` is the above)
     - `~/.ssb-test`: Sets the database in `~/.ssb-test`
-- `keys` *String* (optional) (default: scuttle-testbot generates a new set of random keys)
+- `opts.keys` *String* (optional) (default: scuttle-testbot generates a new set of random keys)
     - you can create your own keys with `ssbKeys.generate()`
-- `startUnclean` (default: `false`)
+- `opts.startUnclean` (default: `false`)
     - `true`: Don't delete an existing database before starting up.
     - this is useful if you want to test state after stopping and starting a server. In this case you need to set the `name` and `keys` options to be connecting to the same log
 - `db2` (default: `false`)
@@ -72,7 +72,7 @@ function Server (opts) {
 }
 ```
 
-### `Testbot.replicate({ from, to, live, name }, done)`
+### `Testbot.replicate({ from, to, live, name, log }, done)`
 
 Replicates data from one testbot to another, which is sometimes needed when you have functions
 which are only triggered by _another_ feedId, e.g. when I am added to a private group someone else started.
@@ -105,7 +105,6 @@ piet.publish(content, (err, msg) => {
 arguments:
 - `from` *SSB* - an ssb instance to be replicated from. This will replicate only this feeds messages (not everything in log)
 - `to` *SSB* - an ssb instance being replicate to.
-- `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
 - `name` *Function* (optional) - makes logged output easier to read by allowing you to replace feedIds with human readable names
     ```js
     // example
@@ -114,6 +113,10 @@ arguments:
       if (feedId === katie.id) return 'katie'
     }
     ```
+- `log` *Function|false* (optional)
+- `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
+    - provide a custom logging function, or disable the logging by setting this `false`
+    - default: `console.log`
 - `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
     - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
@@ -160,23 +163,32 @@ arguments:
     - a collection of ssb instances which will all be connected to one another
     - NOTE: by default scuttle-testbot creates random caps for each instance. You need to overide this as in example to form connections
 
-- `friends` *Boolean* (optional)
-    - if true will get each peer to publish a follow for each other peer in the list
-    - NOTE: this requires `ssb-friends` to be installed
-    - default: `false`
-- `name` *Function* (optional) - makes logged output easier to read by allowing you to replace feedIds with human readable names
-    ```js
-    // example
-    const name = (feedId) => {
-      if (feedId === piet.id) return 'piet'
-      if (feedId === katie.id) return 'katie'
-    }
-    ```
+- `opts` *Object*
+    - `opts.friends` *Boolean* (optional)
+        - if true will get each peer to publish a follow for each other peer in the list
+        - NOTE: this requires `ssb-friends` to be installed
+        - default: `false`
+    - `opts.name` *Function* (optional) - makes logged output easier to read by allowing you to replace feedIds with human readable names
+        ```js
+        // example
+        const name = (feedId) => {
+          if (feedId === piet.id) return 'piet'
+          if (feedId === katie.id) return 'katie'
+        }
+        ```
+    - `opts.log` *Function|false* (optional)
+        - provide a custom logging function, or disable the logging by setting this `false`
+        - default: `console.log`
+
 - `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
     - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
 Under the hood this just uses `createHistoryStream` directly from one peer to another
 
+Also supports promise style.
+```js
+  await Testbot.connect([piet, katie], { friends: true })
+```
 
 ## License
 

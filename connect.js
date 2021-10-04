@@ -1,7 +1,13 @@
 const pull = require('pull-stream')
 const pullParaMap = require('pull-paramap')
 
+const { promisify } = require('util')
+
+const color = require('./color')
+
 module.exports = function connect (peers, opts = {}, cb) { // eslint-disable-line
+  if (cb === undefined) return promisify(connect)(peers, opts)
+
   if (!opts.friends) return allConnect(peers, opts, cb)
 
   allFriends(peers, (err, data) => {
@@ -39,8 +45,10 @@ function allFriends (peers, done) {
 }
 
 function allConnect (peers, opts, done) {
+  const { name = abbrev, log = console.log } = opts
+  const getName = (id) => color(name(id))(name(id))
+
   const connections = new Set()
-  const name = opts.name || abbrev
 
   pull(
     pull.values(peers),
@@ -52,9 +60,9 @@ function allConnect (peers, opts, done) {
             (_peer, _cb) => {
               if (_peer.id === peer.id) return _cb(null)
 
-              const pair = [peer.id, _peer.id].sort()
-              if (connections.has(pair.join())) return _cb(null)
-              connections.add(pair.join())
+              const pairId = [peer.id, _peer.id].sort().join()
+              if (connections.has(pairId)) return _cb(null)
+              connections.add(pairId)
 
               peer.conn.start()
               // NOTE: I have disabled conn autostart in config
@@ -63,7 +71,7 @@ function allConnect (peers, opts, done) {
               // I don't actually know if this is needed!!!
               peer.conn.connect(_peer.getAddress(), (err, rpc) => {
                 if (err) return _cb(err)
-                console.log(pair.map(name).join(' ┄─┄ '))
+                log && log([peer.id, _peer.id].map(getName).join(' ┄─┄ '))
                 cb(null, rpc)
               })
             },
