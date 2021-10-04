@@ -13,7 +13,7 @@ function replicate ({ from, to, live = false, name = defaultName }, done) {
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
 
-    if (!live) process.stdout.write(`\r    ${fromName} ${ARROW} ${toName}\n`)
+    if (!live) console.log(`${fromName} ${ARROW} ${toName}`)
 
     const start = state.sequence + 1
     pull(
@@ -27,11 +27,10 @@ function replicate ({ from, to, live = false, name = defaultName }, done) {
         (m) => {
           if (live) liveLog(m, fromName, toName, name)
           else {
-            process.stdout.write(`\r    ${getSeq(m)} ${getType(m, name)}\n`)
+            console.log(`${getSeq(m)} ${getType(m, name)}`)
           }
         },
         (err) => {
-          process.stdout.write('\n')
           if (typeof done === 'function') return done(err)
           if (err) {
             throw err
@@ -48,7 +47,7 @@ function defaultName (key) {
 }
 
 function liveLog (msg, fromName, toName, name) {
-  console.log(` ${fromName} [${msg.value.sequence}] ${ARROW} ${toName}: ${getType(msg, name)}`)
+  console.log(`${fromName} [${msg.value.sequence}] ${ARROW} ${toName}: ${getType(msg, name)}`)
 }
 
 function getSeq (msg) {
