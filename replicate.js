@@ -1,7 +1,7 @@
 const pull = require('pull-stream')
 const { promisify } = require('util')
 
-const color = require('./color')
+const color = require('color-tag')
 
 const ARROW = '─>'
 const ENCRYPTED_TYPE = '[?]'
@@ -12,9 +12,8 @@ function replicate (opts, done) {
   const { from, to, live = false, name = defaultName, log = console.log } = opts
   if (live && done) throw new Error('cannot set live && done!')
 
-  const fromColor = color(name(from.id))
-  const fromName = fromColor(name(from.id))
-  const toName = color(name(to.id))(name(to.id))
+  const fromName = color(name(from.id), from.id)
+  const toName = color(name(to.id))
 
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
@@ -36,7 +35,7 @@ function replicate (opts, done) {
           if (live) {
             log(`${fromName} [${m.value.sequence}] ${ARROW} ${toName}: ${getType(m, name)}`)
           } else {
-            log(`${fromColor(getSeq(m))} ${getType(m, name)}`)
+            log(`${color(getSeq(m), from.id)} ${getType(m, name)}`)
           }
         },
         (err) => {

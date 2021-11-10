@@ -20,6 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "color-tag": "^1.0.2",
     "pull-paramap": "^1.2.2",
     "pull-stream": "^3.6.14",
     "rimraf": "^3.0.0",

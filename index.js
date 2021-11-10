@@ -6,6 +6,7 @@ const os = require('os')
 
 const replicate = require('./replicate')
 const connect = require('./connect')
+const colorLog = require('./color-log')
 
 let plugins = []
 
@@ -44,5 +45,6 @@ createTestBot.use = function use (plugin) {
 }
 createTestBot.replicate = replicate
 createTestBot.connect = connect
+createTestBot.colorLog = colorLog
 
 module.exports = createTestBot

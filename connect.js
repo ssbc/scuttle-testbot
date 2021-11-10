@@ -3,7 +3,7 @@ const pullParaMap = require('pull-paramap')
 
 const { promisify } = require('util')
 
-const color = require('./color')
+const color = require('color-tag')
 
 module.exports = function connect (peers, opts = {}, cb) { // eslint-disable-line
   if (cb === undefined) return promisify(connect)(peers, opts)
@@ -46,7 +46,7 @@ function allFriends (peers, done) {
 
 function allConnect (peers, opts, done) {
   const { name = abbrev, log = console.log } = opts
-  const getName = (id) => color(name(id))(name(id))
+  const getName = (id) => color(name(id))
 
   const connections = new Set()
 

@@ -190,6 +190,14 @@ Also supports promise style.
   await Testbot.connect([piet, katie], { friends: true })
 ```
 
+### `TestBot.colorLog(obj, ...)`
+
+Like `console.log(JSON.stringify(obj, null, 2))` but also:
+- colorises the cipherlinks based on value - makes it easier to pattern-match across messages
+- removes quotes-marks from keys - easier to read
+- takes multiiple input values
+
+
 ## License
 
 MIT
