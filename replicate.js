@@ -12,8 +12,11 @@ function replicate (opts, done) {
   const { from, to, live = false, name = defaultName, log = console.log } = opts
   if (live && done) throw new Error('cannot set live && done!')
 
-  const fromName = color(name(from.id), from.id)
-  const toName = color(name(to.id))
+  const getName = GetName(from, to, name)
+  const getType = GetType(getName)
+
+  const fromName = color(getName(from.id), from.id)
+  const toName = color(getName(to.id), to.id)
 
   to.getFeedState(from.id, (err, state) => {
     if (err) throw err
@@ -33,9 +36,9 @@ function replicate (opts, done) {
           if (!log) return
 
           if (live) {
-            log(`${fromName} [${m.value.sequence}] ${ARROW} ${toName}: ${getType(m, name)}`)
+            log(`${fromName} [${m.value.sequence}] ${ARROW} ${toName}: ${getType(m)}`)
           } else {
-            log(`${color(getSeq(m), from.id)} ${getType(m, name)}`)
+            log(`${color(getSeq(m), from.id)} ${getType(m)}`)
           }
         },
         (err) => {
@@ -50,6 +53,17 @@ function replicate (opts, done) {
 }
 module.exports = replicate
 
+function GetName (from, to, name) {
+  const map = {
+    [from.id]: from.name,
+    [to.id]: to.name
+  }
+
+  return function getName (id) {
+    if (map[id]) return map[id]
+    return name(id)
+  }
+}
 function defaultName (key) {
   return key.slice(0, 9)
 }
@@ -61,12 +75,16 @@ function getSeq (msg) {
   return seq
 }
 
-function getType (msg, name) {
-  const { type = ENCRYPTED_TYPE, recps } = msg.value.content
+function GetType (getName) {
+  return function getType (msg) {
+    const { type = ENCRYPTED_TYPE, recps } = msg.value.content
 
-  const addedMembers = type === 'group/add-member'
-    ? ` ─ ${recps.filter(r => r[0] === '@').map(name)}`
-    : ''
+    if (type !== 'group/add-member') return type
 
-  return type + addedMembers
+    const addedMembers = recps
+      .filter(recp => !recp.endsWith('cloaked'))
+      .map(recp => color(getName(recp), recp))
+
+    return `${type}  ─ ${addedMembers.join(', ')}`
+  }
 }

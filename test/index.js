@@ -1,9 +1,9 @@
-var test = require('tape')
-var fs = require('fs')
-var CreateTestSbot = require('../')
+const test = require('tape')
+const fs = require('fs')
+const CreateTestSbot = require('../')
 
 test('creates an sbot', function (t) {
-  var sbot = CreateTestSbot({ name: 'piet' })
+  const sbot = CreateTestSbot({ name: 'piet' })
   t.ok(sbot)
   sbot.close()
   t.end()
@@ -14,7 +14,7 @@ test('adds an sbot plugin and can be chained', function (t) {
     .use({ init: () => {}, name: 'fakePlugin1' })
     .use({ init: () => {}, name: 'fakePlugin2' })
 
-  var sbot = CreateTestSbot()
+  const sbot = CreateTestSbot()
 
   t.ok(sbot)
   sbot.close()
@@ -25,14 +25,14 @@ test('multi sbots that share some of the same plugins', function (t) {
   CreateTestSbot
     .use({ init: () => {}, name: 'fakePlugin1' })
 
-  var sbot1 = CreateTestSbot()
+  const sbot1 = CreateTestSbot()
   t.ok(sbot1)
 
   CreateTestSbot
     .use({ init: () => {}, name: 'fakePlugin1' })
     .use({ init: () => {}, name: 'fakePlugin2' })
 
-  var sbot2 = CreateTestSbot()
+  const sbot2 = CreateTestSbot()
   t.ok(sbot2)
 
   sbot1.close()
@@ -75,7 +75,7 @@ test('allows specifying the path to the db', (t) => {
 })
 
 test('can use db2', function (t) {
-  var sbot = CreateTestSbot({ db2: true })
+  const sbot = CreateTestSbot({ db2: true })
   t.ok(sbot.db)
   sbot.close(t.end)
 })

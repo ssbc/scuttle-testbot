@@ -44,16 +44,13 @@ test('replicate (promise)', async t => {
     .use(require('ssb-backlinks'))
     .use(require('ssb-tribes'))
     .call()
+  piet.name = 'piet'
 
   const katie = TestBot
     .use(require('ssb-backlinks'))
     .use(require('ssb-tribes'))
     .call()
-
-  const name = (feedId) => {
-    if (feedId === piet.id) return 'piet'
-    if (feedId === katie.id) return 'katie'
-  }
+  katie.name = 'katie'
 
   const { groupId } = await p(piet.tribes.create)({})
 
@@ -68,7 +65,7 @@ test('replicate (promise)', async t => {
 
   await p(piet.tribes.invite)(groupId, [katie.id], {})
 
-  await TestBot.replicate({ from: piet, to: katie, name })
+  await TestBot.replicate({ from: piet, to: katie })
 
   // HACK give it a moment to rebuild!
   await new Promise(resolve => setTimeout(resolve, 300))

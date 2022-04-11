@@ -72,7 +72,7 @@ function Server (opts) {
 }
 ```
 
-### `Testbot.replicate({ from, to, live, name, log }, done)`
+### `Testbot.replicate({ from, to, live?, name?, log? }, done)`
 
 Replicates data from one testbot to another, which is sometimes needed when you have functions
 which are only triggered by _another_ feedId, e.g. when I am added to a private group someone else started.
@@ -113,6 +113,11 @@ arguments:
       if (feedId === katie.id) return 'katie'
     }
     ```
+    - alternatively, if an instance has a "name" property, then that will be used, e.g.
+        ```js
+        const piet = TestBot()
+        piet.name = 'piet'
+        ```
 - `log` *Function|false* (optional)
 - `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
     - provide a custom logging function, or disable the logging by setting this `false`
