@@ -25,18 +25,18 @@
     "pull-stream": "^3.6.14",
     "rimraf": "^3.0.0",
     "secret-stack": "^6.4.0",
-    "ssb-conn": "^6.0.1",
+    "ssb-conn": "^6.0.3",
     "ssb-db": "^20.4.1",
-    "ssb-db2": "^3.4.1",
-    "ssb-keys": "^8.2.0",
-    "ssb-tribes": "^2.4.1",
-    "ssb-validate2-rsjs-node": "^1.0.4"
+    "ssb-db2": "^5.2.0",
+    "ssb-keys": "^8.4.1"
   },
   "devDependencies": {
     "ssb-backlinks": "^2.1.1",
+    "ssb-query": "^2.4.5",
     "ssb-friends": "^4.4.7",
     "ssb-replicate": "^1.3.3",
-    "tap-arc": "^0.3.4",
-    "tape": "^5.3.1"
+    "ssb-tribes": "^3.0.2",
+    "tap-arc": "^0.3.5",
+    "tape": "^5.5.3"
   }
 }

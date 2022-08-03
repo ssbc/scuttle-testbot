@@ -42,12 +42,14 @@ test('replicate', t => {
 test('replicate (promise)', async t => {
   const piet = TestBot
     .use(require('ssb-backlinks'))
+    .use(require('ssb-query'))
     .use(require('ssb-tribes'))
     .call()
   piet.name = 'piet'
 
   const katie = TestBot
     .use(require('ssb-backlinks'))
+    .use(require('ssb-query'))
     .use(require('ssb-tribes'))
     .call()
   katie.name = 'katie'
