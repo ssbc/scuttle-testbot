@@ -27,7 +27,7 @@
     "secret-stack": "^6.4.0",
     "ssb-conn": "^6.0.3",
     "ssb-db": "^20.4.1",
-    "ssb-db2": "^5.2.0",
+    "ssb-db2": "^6.2.7",
     "ssb-keys": "^8.4.1"
   },
   "devDependencies": {
