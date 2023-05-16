@@ -51,10 +51,12 @@ Valid `opts` keys include:
     - `~/.ssb-test`: Sets the database in `~/.ssb-test`
 - `opts.keys` *String* (optional) (default: scuttle-testbot generates a new set of random keys)
     - you can create your own keys with `ssbKeys.generate()`
-- `opts.startUnclean` (default: `false`)
-    - `true`: Don't delete an existing database before starting up.
+- `opts.rimraf` (default: `true`)
+    - `false`: Don't delete an existing database before starting up.
     - this is useful if you want to test state after stopping and starting a server. In this case you need to set the `name` and `keys` options to be connecting to the same log
-- `db2` (default: `false`)
+    - note `opts.startUnclean` is still accepted
+- `opts.db1` (default: `false`)
+    - uses `ssb-db2` by default, but if `true` will use `ssb-db`
 
 ### `TestBot.use(plugin)`
 
@@ -117,6 +119,9 @@ arguments:
         ```js
         const piet = TestBot()
         piet.name = 'piet'
+        ```
+        ```js
+        const piet = TestBot({ name: 'katie ' })
         ```
 - `log` *Function|false* (optional)
 - `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).

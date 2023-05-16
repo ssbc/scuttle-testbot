@@ -3,7 +3,8 @@ const { promisify } = require('util')
 
 const color = require('color-tag')
 
-const ARROW = '─>'
+const ARROW = '⇒'
+
 const ENCRYPTED_TYPE = '[?]'
 
 function replicate (opts, done) {
@@ -50,6 +51,11 @@ function replicate (opts, done) {
       )
     )
   })
+
+  function defaultName (id) {
+    const peer = from.id === id ? from : to
+    return peer.name || id.slice(0, 10)
+  }
 }
 module.exports = replicate
 
@@ -63,9 +69,6 @@ function GetName (from, to, name) {
     if (map[id]) return map[id]
     return name(id)
   }
-}
-function defaultName (key) {
-  return key.slice(0, 9)
 }
 
 function getSeq (msg) {
