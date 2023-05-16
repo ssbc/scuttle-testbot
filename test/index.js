@@ -1,5 +1,6 @@
 const test = require('tape')
 const fs = require('fs')
+const { join } = require('path')
 const CreateTestSbot = require('../')
 
 test('creates an sbot', function (t) {
@@ -40,42 +41,56 @@ test('multi sbots that share some of the same plugins', function (t) {
   t.end()
 })
 
-test('persist database across instances', (t) => {
-  const a = CreateTestSbot({ name: 'persistent' })
+function Testbot (opts) {
+  if (!process.env.SSB_DB1) CreateTestSbot.use(require('ssb-db2/compat'))
+  return CreateTestSbot(opts)
+}
 
-  a.publish({ type: 'test' }, (err, val) => {
-    t.error(err, 'no error on publish')
+test('persist database across instances', (t) => {
+  const a = Testbot({ name: 'persistent' })
+  const content = { type: 'test' }
+
+  a.publish(content, (err, val) => {
+    t.error(err, 'publish message')
+    const msgId = val && val.key
     a.close((err) => {
-      t.error(err, 'no error on close')
-      const b = CreateTestSbot({
+      t.error(err, 'restart (startUnclean: true)')
+      const b = Testbot({
         name: 'persistent',
-        startUnclean: true,
-        keys: a.keys
+        keys: a.keys,
+        startUnclean: true
       })
-      b.get(val.key, (err, val) => {
-        t.error(err, 'no error on get')
-        t.ok(val, 'got message')
-        b.close(t.end)
+      b.get(msgId, (_, val) => {
+        t.deepEqual(val.content, content, 'got message')
+        b.close((err) => {
+          t.error(err, 'restart (rimraf: false)')
+          const c = Testbot({
+            name: 'persistent',
+            keys: a.keys,
+            rimraf: false
+          })
+          c.get(msgId, (_, val) => {
+            t.deepEqual(val.content, content, 'got message')
+            c.close(t.end)
+          })
+        })
       })
     })
   })
 })
 
 test('allows specifying the path to the db', (t) => {
-  const a = CreateTestSbot({ path: '/tmp/overhere/scuttle-testbot' })
+  const path = '/tmp/overhere/scuttle-testbot'
+  const a = Testbot({ path })
 
   a.publish({ type: 'test' }, (err, val) => {
     t.error(err, 'no error on publish')
     a.close((err) => {
       t.error(err, 'no error on close')
-      t.true(fs.existsSync('/tmp/overhere/scuttle-testbot/conn.json'))
+      const expectedFolder = process.env.SSB_DB1 ? 'flume' : 'db2'
+      const expectedPath = join(path, expectedFolder)
+      t.true(fs.existsSync(expectedPath), 'can see server stored details at opts.path')
       t.end()
     })
   })
-})
-
-test('can use db2', function (t) {
-  const sbot = CreateTestSbot({ db2: true })
-  t.ok(sbot.db)
-  sbot.close(t.end)
 })

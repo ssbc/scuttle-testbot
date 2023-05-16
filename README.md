@@ -6,11 +6,12 @@
 ## Usage
 
 ```js
-var TestBot = require('scuttle-testbot')
+const TestBot = require('scuttle-testbot')
 
-var piet = TestBot()
+const piet = TestBot()
+const content = { type: 'test', text: "a test message" }
 
-piet.publish({type: 'test', content: "a test message"}, (err, msg) => {
+piet.db.create publish({ content }, (err, msg) => {
   console.log(msg)
   piet.close()
 })
@@ -36,7 +37,7 @@ Outputs:
 ## API
 
 ```js
-var TestBot = require('scuttle-testbot')
+const TestBot = require('scuttle-testbot')
 ```
 
 ### `TestBot(opts = {})`
@@ -51,10 +52,13 @@ Valid `opts` keys include:
     - `~/.ssb-test`: Sets the database in `~/.ssb-test`
 - `opts.keys` *String* (optional) (default: scuttle-testbot generates a new set of random keys)
     - you can create your own keys with `ssbKeys.generate()`
-- `opts.startUnclean` (default: `false`)
-    - `true`: Don't delete an existing database before starting up.
+- `opts.rimraf` (default: `true`)
+    - `false`: Don't delete an existing database before starting up.
     - this is useful if you want to test state after stopping and starting a server. In this case you need to set the `name` and `keys` options to be connecting to the same log
-- `db2` (default: `false`)
+    - note `opts.startUnclean` is still accepted
+- `opts.db1` (default: `false`)
+    - uses `ssb-db2` by default, but if `true` will use `ssb-db`
+    - your can also switch to db1 by setting the ENV `SSB_DB1=true`
 
 ### `TestBot.use(plugin)`
 
@@ -80,17 +84,25 @@ which are only triggered by _another_ feedId, e.g. when I am added to a private 
 Example:
 
 ```js
-const piet = TestBot()
-const katie = TestBot()
+function Server (opts) {
+  const stack = require('scuttle-testbot')
+    // required for replicate
+    .use(require('ssb-db2/compat/feedstate'))
+    .use(require('ssb-db2/compat/history-stream'))
+
+  return stack(opts)
+}
+const piet = Server({ name: 'piet' })
+const katie = Server({ name: 'katie' })
 
 const content = {
   type: 'direct-message',
   text: 'oh hey'
 }
 
-piet.publish(content, (err, msg) => {
+piet.db.create({ content }, (err, msg) => {
   TestBot.replicate({ from: piet, to: katie }, (err) => {
-    katie.get({ id: msg.key, private: true }, (err, value) => {
+    katie.db.getMsg(msg.key, private: true }, (err, value) => {
 
       console.log(value.content)
       // should be same as content piet sent, if katie can decrypt
@@ -118,6 +130,9 @@ arguments:
         const piet = TestBot()
         piet.name = 'piet'
         ```
+        ```js
+        const piet = TestBot({ name: 'katie ' })
+        ```
 - `log` *Function|false* (optional)
 - `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
     - provide a custom logging function, or disable the logging by setting this `false`
@@ -142,16 +157,17 @@ Example:
 ```js
 const crypto = require('crypto')
 
-const Server = (opts) => {
+function Server (opts) {
   const stack = require('scuttle-testbot')
+    .use('ssb-conn')
     .use('ssb-friends') // only needed if opts.friends
 
   return stack(opts)
 }
 
 const caps = { shs: crypto.randomBytes(32).toString('base64') }
-const piet = Server({ caps })
-const katie = Server({ caps })
+const piet = Server({ caps, name: 'piet' })
+const katie = Server({ caps, name: 'katie' })
 // all peers need to have same caps to be able to connect to each other
 
 Testbot.connect([piet, katie], { friends: true }, (err) => {

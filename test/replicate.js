@@ -1,17 +1,35 @@
 const test = require('tape')
 const pull = require('pull-stream')
 const { promisify: p } = require('util')
+const { replicate } = require('../')
 
-const TestBot = require('../')
+const isDB2 = !process.env.SSB_DB1
+
+let plugins = []
+function TestBot (opts) {
+  const stack = require('../')
+
+  if (isDB2) {
+    stack.use([
+      // needed because tests use publish
+      require('ssb-db2/compat/db'),
+      require('ssb-db2/compat/publish'),
+      // needed for replicate
+      require('ssb-db2/compat/feedstate'),
+      require('ssb-db2/compat/history-stream')
+    ])
+  }
+
+  plugins.forEach(plugin => stack.use(plugin))
+  plugins = []
+
+  return stack(opts)
+}
+TestBot.use = (plugin) => plugins.push(plugin) && TestBot
 
 test('replicate', t => {
-  const piet = TestBot()
-  const katie = TestBot()
-
-  const name = (feedId) => {
-    if (feedId === piet.id) return 'piet'
-    if (feedId === katie.id) return 'katie'
-  }
+  const piet = TestBot({ name: 'piet' })
+  const katie = TestBot({ name: 'katie' })
 
   const content = {
     type: 'direct-message',
@@ -21,7 +39,7 @@ test('replicate', t => {
   piet.publish(content, (err, msg) => {
     if (err) throw err
 
-    TestBot.replicate({ from: piet, to: katie, name }, (err) => {
+    replicate({ from: piet, to: katie }, (err) => {
       if (err) throw err
 
       katie.get({ id: msg.key, private: true }, (err, value) => {
@@ -40,44 +58,35 @@ test('replicate', t => {
 })
 
 test('replicate (promise)', async t => {
-  const piet = TestBot
-    .use(require('ssb-backlinks'))
-    .use(require('ssb-query'))
-    .use(require('ssb-tribes'))
-    .call()
+  const piet = TestBot()
   piet.name = 'piet'
 
-  const katie = TestBot
-    .use(require('ssb-backlinks'))
-    .use(require('ssb-query'))
-    .use(require('ssb-tribes'))
-    .call()
+  const katie = TestBot()
   katie.name = 'katie'
-
-  const { groupId } = await p(piet.tribes.create)({})
 
   const content = {
     type: 'direct-message',
-    text: 'oh hey',
-    recps: [groupId]
+    text: 'oh hey'
   }
 
-  for (let i = 0; i < 10; i++) await p(piet.publish)(content)
   const msg = await p(piet.publish)(content)
+    .then(msg => { t.pass('piet publishes a message'); return msg })
+    .catch(err => t.error(err, 'piet publishes a message'))
 
-  await p(piet.tribes.invite)(groupId, [katie.id], {})
+  await replicate({ from: piet, to: katie })
+    .then(() => t.pass('replicate'))
+    .catch(err => t.error(err, 'replicate'))
 
-  await TestBot.replicate({ from: piet, to: katie })
+  const value = await p(katie.get)({ id: msg.key })
+    .catch(err => t.error(err, 'katie can get message'))
 
-  // HACK give it a moment to rebuild!
-  await new Promise(resolve => setTimeout(resolve, 300))
-  const value = await p(katie.get)({ id: msg.key, private: true })
-
-  t.deepEqual(value.content, content)
+  t.deepEqual(value.content, content, 'katie can read the msg')
   // should be same as content piet sent, if katie can decrypt
 
-  piet.close()
-  katie.close()
+  await Promise.all([
+    p(piet.close)(true),
+    p(katie.close)(true)
+  ])
 
   t.end()
 })
@@ -101,12 +110,12 @@ test('replicate (live)', t => {
     pull.drain(msg => {
       t.deepEqual(msg.value.content, content)
 
-      piet.close()
-      katie.close()
+      piet.close(true)
+      katie.close(true)
       t.end()
     })
   )
-  TestBot.replicate({ from: piet, to: katie, name, live: true })
+  replicate({ from: piet, to: katie, name, live: true })
 
   piet.publish(content, () => {})
 })
@@ -121,7 +130,7 @@ test('replicate (log: false)', async t => {
   }
   const msg = await p(piet.publish)(content)
 
-  await TestBot.replicate({ from: piet, to: katie, log: false })
+  await replicate({ from: piet, to: katie, log: false })
 
   const value = await p(katie.get)({ id: msg.key, private: true })
 

@@ -11,32 +11,44 @@ const colorLog = require('./color-log')
 let plugins = []
 
 function createTestBot (opts = {}) {
-  if (!opts.name) {
-    opts.name = `ssb-test-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-  }
-  if (!opts.path) {
-    opts.path = join(os.tmpdir(), opts.name)
-  }
-  if (!opts.startUnclean) { rimraf.sync(opts.path) }
+  if (!opts.name) { opts.name = randomName() }
+  if (!opts.path) { opts.path = join(os.tmpdir(), opts.name) }
   if (!opts.keys) { opts.keys = ssbKeys.generate() }
 
-  if (!opts.conn) opts.conn = {}
-  if (typeof opts.conn.autostart !== 'boolean') opts.conn.autostart = false
+  opts.conn = {
+    autostart: false,
+    ...opts.conn
+  }
+
+  opts.db2 = {
+    // tune db2 for quick write then read (instead of bulk write)
+    addBatchThrottle: 50,
+    writeTimeout: 50,
+    ...opts.db2
+  }
 
   const caps = {
-    shs: (opts.caps && opts.caps.shs) || crypto.randomBytes(32).toString('base64')
+    shs: crypto.randomBytes(32).toString('base64'),
+    ...opts.caps
   }
-  let createSbot = require('secret-stack')({ caps })
-    .use(require('ssb-conn'))
 
-  if (opts.db2) createSbot.use(require('ssb-db2'))
-  else createSbot.use(require('ssb-db'))
+  const createSbot = require('secret-stack')({ caps })
+    .use((process.env.SSB_DB1 || opts.db1)
+      ? require('ssb-db')
+      : require('ssb-db2')
+    )
 
-  if (createSbot.createSbot) { createSbot = createSbot.createSbot() }
   plugins.forEach(plugin => createSbot.use(plugin))
   plugins = []
 
-  return createSbot(opts)
+  if (
+    opts.startUnclean !== true &&
+    opts.rimraf !== false
+  ) { rimraf.sync(opts.path) }
+
+  const sbot = createSbot(opts)
+  if (!sbot.name) sbot.name = opts.name
+  return sbot
 }
 
 createTestBot.use = function use (plugin) {
@@ -48,3 +60,7 @@ createTestBot.connect = connect
 createTestBot.colorLog = colorLog
 
 module.exports = createTestBot
+
+function randomName () {
+  return `ssb-test-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+}

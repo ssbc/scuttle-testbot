@@ -45,7 +45,7 @@ function allFriends (peers, done) {
 }
 
 function allConnect (peers, opts, done) {
-  const { name = abbrev, log = console.log } = opts
+  const { name = defaultName, log = console.log } = opts
   const getName = (id) => color(name(id))
 
   const connections = new Set()
@@ -71,7 +71,8 @@ function allConnect (peers, opts, done) {
               // I don't actually know if this is needed!!!
               peer.conn.connect(_peer.getAddress(), (err, rpc) => {
                 if (err) return _cb(err)
-                log && log([peer.id, _peer.id].map(getName).join(' ┄─┄ '))
+
+                if (log) log([peer.id, _peer.id].map(getName).join(' ┄─┄ '))
                 cb(null, rpc)
               })
             },
@@ -84,8 +85,9 @@ function allConnect (peers, opts, done) {
     ),
     pull.collect(done)
   )
-}
 
-function abbrev (id) {
-  return id.slice(0, 10)
+  function defaultName (id) {
+    const peer = peers.find(peer => peer.id === id)
+    return peer.name || id.slice(0, 10)
+  }
 }
