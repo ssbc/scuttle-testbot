@@ -30,7 +30,7 @@
     "secret-stack": "^6.4.1",
     "ssb-conn": "^6.0.4",
     "ssb-db": "^20.4.1",
-    "ssb-db2": "github:ssbc/ssb-db2#historyStream_live",
+    "ssb-db2": "^7.1.1",
     "ssb-keys": "^8.5.0"
   },
   "devDependencies": {
