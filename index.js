@@ -20,6 +20,13 @@ function createTestBot (opts = {}) {
     ...opts.conn
   }
 
+  opts.db2 = {
+    // tune db2 for quick write then read (instead of bulk write)
+    addBatchThrottle: 50,
+    writeTimeout: 50,
+    ...opts.db2
+  }
+
   const caps = {
     shs: crypto.randomBytes(32).toString('base64'),
     ...opts.caps
