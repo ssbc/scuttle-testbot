@@ -16,16 +16,9 @@ function TestBot (opts) {
       require('ssb-db2/compat/publish'),
       // needed for replicate
       require('ssb-db2/compat/feedstate'),
-      require('ssb-db2/compat/ebt'),
-      require('ssb-db2/compat/log-stream'),
       require('ssb-db2/compat/history-stream')
     ])
   }
-
-  stack
-    .use(require('ssb-conn'))
-    .use(require('ssb-friends'))
-    .use(require('ssb-replicate')) // required by this version of friends
 
   plugins.forEach(plugin => stack.use(plugin))
   plugins = []
