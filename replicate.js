@@ -10,7 +10,14 @@ const ENCRYPTED_TYPE = '[?]'
 function replicate (opts, done) {
   if (!opts.live && !done) return promisify(replicate)(opts)
 
-  const { from, to, live = false, name = defaultName, log = console.log } = opts
+  const {
+    feedId = opts.from.id,
+    from,
+    to,
+    live = false,
+    name = defaultName,
+    log = console.log
+  } = opts
   if (live && done) throw new Error('cannot set live && done!')
 
   const getName = GetName(from, to, name)
@@ -19,14 +26,14 @@ function replicate (opts, done) {
   const fromName = color(getName(from.id), from.id)
   const toName = color(getName(to.id), to.id)
 
-  to.getFeedState(from.id, (err, state) => {
+  to.getFeedState(feedId, (err, state) => {
     if (err) throw err
 
     if (!live && log) log(`${fromName} ${ARROW} ${toName}`)
 
     const start = state.sequence + 1
     pull(
-      from.createHistoryStream({ id: from.id, seq: start, live }),
+      from.createHistoryStream({ id: feedId, seq: start, live }),
       pull.filter(m => m.sync !== true),
       pull.asyncMap((m, cb) => to.add(m.value, cb)),
       pull.asyncMap((m, cb) =>

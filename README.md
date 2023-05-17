@@ -76,7 +76,7 @@ function Server (opts) {
 }
 ```
 
-### `Testbot.replicate({ from, to, live?, name?, log? }, done)`
+### `Testbot.replicate({ from, to, feedId?, live?, name?, log? }, done)`
 
 Replicates data from one testbot to another, which is sometimes needed when you have functions
 which are only triggered by _another_ feedId, e.g. when I am added to a private group someone else started.
@@ -117,6 +117,12 @@ piet.db.create({ content }, (err, msg) => {
 arguments:
 - `from` *SSB* - an ssb instance to be replicated from. This will replicate only this feeds messages (not everything in log)
 - `to` *SSB* - an ssb instance being replicate to.
+- `feedId` *String* (optional)
+    - the id of the feed you would like to replicate from one peer to another
+    - default: `from.id`
+- `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
+    - provide a custom logging function, or disable the logging by setting this `false`
+    - default: `console.log`
 - `name` *Function* (optional) - makes logged output easier to read by allowing you to replace feedIds with human readable names
     ```js
     // example
@@ -134,9 +140,6 @@ arguments:
         const piet = TestBot({ name: 'katie ' })
         ```
 - `log` *Function|false* (optional)
-- `live` *Boolean* (optional)- whether or not to keep replication running (default: `false`).
-    - provide a custom logging function, or disable the logging by setting this `false`
-    - default: `console.log`
 - `done` *Function* - an optional callback which is triggered when the replication is complete or if there is an error.
     - If `live === true` this will ony be called on an error. Signature `done (err) { ... }`
 
