@@ -36,7 +36,7 @@ function createTestBot (opts = {}) {
   
   if (process.env.SSB_DB1 || opts.db1) {
     createSbot.use(require('ssb-db'))
-  } else if (opts.noUse) {
+  } else if (opts.noDefaultUse) {
     // no use
   } else {
     createSbot.use(require('ssb-db2'))
