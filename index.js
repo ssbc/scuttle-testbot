@@ -33,10 +33,14 @@ function createTestBot (opts = {}) {
   }
 
   const createSbot = require('secret-stack')({ caps })
-    .use((process.env.SSB_DB1 || opts.db1)
-      ? require('ssb-db')
-      : require('ssb-db2')
-    )
+  
+  if (process.env.SSB_DB1 || opts.db1) {
+    createSbot.use(require('ssb-db'))
+  } else if (opts.noDefaultUse) {
+    // no use
+  } else {
+    createSbot.use(require('ssb-db2'))
+  }
 
   plugins.forEach(plugin => createSbot.use(plugin))
   plugins = []

@@ -59,6 +59,8 @@ Valid `opts` keys include:
 - `opts.db1` (default: `false`)
     - uses `ssb-db2` by default, but if `true` will use `ssb-db`
     - your can also switch to db1 by setting the ENV `SSB_DB1=true`
+- `opts.noDefaultUse` (default: `false`)
+    - if true then the testbot uses neither db1 nor db2 by default, leaving that up to you. Useful e.g. in case you want to control what plugins get imported along with db2.
 
 ### `TestBot.use(plugin)`
 
